@@ -1,0 +1,16 @@
+
+services:
+  ha_audio_backend:
+    build: .
+
+    restart: unless-stopped
+
+    command: ["python", "main.py"]
+
+    env_file:
+      - .env
+
+    volumes:
+    - ./models:/app/models
+
+    network_mode: host

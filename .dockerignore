@@ -1,0 +1,35 @@
+# Python/Django-related
+__pycache__/
+*.py[cod]
+*.so
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+
+# Environment
+.env
+.env.*
+venv/
+.venv/
+
+# Git
+.git
+.gitignore
+
+# Docker and editor files
+Dockerfile
+docker-compose.yml
+.DS_Store
+
+# Logs and database
+*.log
+*.sqlite3
+
+# IDEs
+.idea/
+.vscode/
+
+# Models
+models/
