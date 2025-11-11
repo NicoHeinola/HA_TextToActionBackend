@@ -5,7 +5,7 @@ router = APIRouter()
 
 @router.get("/")
 def read_root():
-    return {"message": "Audio Playback Backend is running."}
+    return {"message": "Text to Action Backend is running."}
 
 
 @router.get("/favicon.ico")
