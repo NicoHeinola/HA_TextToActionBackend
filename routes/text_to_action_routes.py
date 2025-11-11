@@ -26,7 +26,7 @@ def convert_text_to_action(token: str = require_auth(), body: dict = Body(...)):
 @router.get("/models")
 def list_models(token: str = require_auth(), body: dict = Body(...)):
     """
-    Endpoint to list available Vosk speech-to-text models.
+    Endpoint to list available text-to-action models.
     """
     model_type: str = body.get("model_type", "")
 
