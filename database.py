@@ -8,7 +8,7 @@ load_dotenv(override=False)
 
 # Ensure the database_instance directory exists
 SQLALCHEMY_DATABASE_URL: str = os.getenv("SQLALCHEMY_DATABASE_URL", "")
-os.makedirs(os.path.dirname(SQLALCHEMY_DATABASE_URL), exist_ok=True)
+os.makedirs(os.path.dirname(SQLALCHEMY_DATABASE_URL.replace("sqlite:///", "")), exist_ok=True)
 
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL,
