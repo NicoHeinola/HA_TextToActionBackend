@@ -1,3 +1,7 @@
+# Models
+/models/text_prediction/gguf/*
+!/models/text_prediction/gguf/README.md
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
