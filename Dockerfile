@@ -10,12 +10,6 @@ FROM builder AS final
 
 WORKDIR /app
 
-# Install ffmpeg so pydub/ffprobe are available at runtime
-ENV DEBIAN_FRONTEND=noninteractive
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends ffmpeg \
-    && rm -rf /var/lib/apt/lists/*
-
 # Copy application code
 COPY . .
 
