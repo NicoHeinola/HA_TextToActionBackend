@@ -33,3 +33,6 @@ docker-compose.yml
 
 # Models
 models/
+
+# Database
+./database_instance

@@ -12,5 +12,8 @@ services:
 
     volumes:
     - ./models:/app/models
+    - ./database_instance:/app/database_instance
+    - ./seeders:/app/seeders
+    - ./alembic:/app/alembic
 
     network_mode: host

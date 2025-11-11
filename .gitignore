@@ -1,3 +1,6 @@
+# Database
+/database_instance
+
 # Models
 /models/text_prediction/gguf/*
 !/models/text_prediction/gguf/README.md
