@@ -7,7 +7,7 @@ from helpers.text_to_action.text_to_action import TextToAction
 router = APIRouter()
 
 
-@router.post("/convert")
+@router.post("/")
 def convert_text_to_action(token: str = require_auth(), body: dict = Body(...)):
     """
     Endpoint to convert text to action using TextToAction helper.
