@@ -30,6 +30,9 @@ def list_models(token: str = require_auth(), body: dict = Body(...)):
     """
     model_type: str = body.get("model_type", "")
 
+    # Sanitize
+    model_type = model_type.strip().lower().replace(" ", "_").replace("-", "_").replace(".", "_").replace("/", "_")
+
     if not model_type:
         return Response(content="model_type is required in the request body", status_code=422)
 
