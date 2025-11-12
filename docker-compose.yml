@@ -1,11 +1,11 @@
 
 services:
   ha_audio_backend:
-    build: .
+    build:
+      context: .
 
     restart: unless-stopped
-
-    command: ["python", "main.py"]
+    entrypoint: ["sh", "-lc", "alembic upgrade head && python run_seeders.py && exec python main.py"]
 
     env_file:
       - .env
@@ -13,7 +13,13 @@ services:
     volumes:
     - ./models:/app/models
     - ./database_instance:/app/database_instance
-    - ./seeders:/app/seeders
-    - ./alembic:/app/alembic
+
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
 
     network_mode: host
