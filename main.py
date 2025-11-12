@@ -5,6 +5,7 @@ from fastapi import FastAPI
 import uvicorn
 from routes.index import router as index_router
 from routes.text_to_action_routes import router as text_to_action_router
+from routes.setting_routes import router as setting_router
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s]: %(message)s")
 
@@ -13,6 +14,7 @@ app = FastAPI()
 # Include routes
 app.include_router(index_router)
 app.include_router(text_to_action_router, prefix="/text-to-action")
+app.include_router(setting_router, prefix="/settings")
 
 if __name__ == "__main__":
     load_dotenv()
