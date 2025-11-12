@@ -1,14 +1,20 @@
 import os
-from fastapi import APIRouter, Body, Response
+from fastapi import APIRouter, Body, Depends, Response
 
+from database import get_db
+from db_models.action import Action
+from db_models.setting import Setting, SettingKey
+from helpers.models.text_prediction.gguf.gguf_text_prediction_model import GGUFTextPredictionModel
+from helpers.models.text_prediction.text_prediction_model import TextPredictionModel
 from middleware.auth import require_auth
 from helpers.text_to_action.text_to_action import TextToAction
+from sqlalchemy.orm import Session
 
 router = APIRouter()
 
 
 @router.post("/")
-def convert_text_to_action(token: str = require_auth(), body: dict = Body(...)):
+def convert_text_to_action(token: str = require_auth(), body: dict = Body(...), db: Session = Depends(get_db)):
     """
     Endpoint to convert text to action using TextToAction helper.
     """
@@ -18,8 +24,17 @@ def convert_text_to_action(token: str = require_auth(), body: dict = Body(...)):
     if not text:
         return Response(content="text is required in the request body", status_code=422)
 
-    text_to_action: TextToAction = TextToAction()
-    result: dict = text_to_action.convert_text_to_action(text)
+    system_prompt: str = Setting.get_setting(db, SettingKey.SYSTEM_PROMPT)
+
+    model: TextPredictionModel = GGUFTextPredictionModel(
+        model_name="Phi-3-mini-4k-instruct-q4.gguf",
+        system_prompt=system_prompt,
+    )
+
+    actions = db.query(Action).all()
+    text_to_action: TextToAction = TextToAction(model)
+
+    result: dict = text_to_action.convert_text_to_action(text, actions=actions)
     return result
 
 

@@ -1,5 +1,10 @@
 from sqlalchemy import Column, Integer, String
 from db_models.base import Base
+from sqlalchemy.orm import Session
+
+
+class SettingKey:
+    SYSTEM_PROMPT = "system_prompt"
 
 
 class Setting(Base):
@@ -8,3 +13,12 @@ class Setting(Base):
     key = Column(String, unique=True, nullable=False, index=True)
     value = Column(String, nullable=False)
     type = Column(String, nullable=False)  # 'int', 'string', 'float', 'boolean'
+
+    @staticmethod
+    def get_setting(db: Session, key: str) -> str:
+        setting: Setting | None = db.query(Setting).filter(Setting.key == key).first()
+
+        if setting is None:
+            return ""
+
+        return str(setting.value)
