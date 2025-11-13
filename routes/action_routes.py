@@ -80,3 +80,15 @@ def delete_action(action_id: int, token: str = require_auth(), db: Session = Dep
     db.commit()
 
     return Response(status_code=204)
+
+
+@router.delete("/")
+def delete_all_actions(token: str = require_auth(), db: Session = Depends(get_db)):
+    """
+    Endpoint to delete all actions.
+    """
+
+    db.query(Action).delete()
+    db.commit()
+
+    return Response(status_code=204)
