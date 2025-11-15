@@ -26,6 +26,7 @@ class TextToAction:
 
         # Try to convert prediction to JSON
         try:
+            logger.info(f"Raw prediction before JSON parsing: {prediction}")
             prediction_json = json.loads(prediction)
         except json.JSONDecodeError as e:
             logger.error(f"Failed to parse prediction as JSON: {e}")
