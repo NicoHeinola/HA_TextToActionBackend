@@ -36,16 +36,21 @@ def convert_text_to_action(token: str = require_auth(), body: dict = Body(...), 
     system_prompt = system_prompt.replace("{actions}", json.dumps(actions_as_array))
 
     try:
-        model: TextPredictionModel = GGUFTextPredictionModel(
+        model: TextPredictionModel | None = GGUFTextPredictionModel(
             model_name=model_name,
             system_prompt=system_prompt,
         )
     except FileNotFoundError as e:
         return Response(content=str(e), status_code=422)
 
-    text_to_action: TextToAction = TextToAction(model)
+    text_to_action: TextToAction | None = TextToAction(model)
 
     result: dict = text_to_action.convert_text_to_action(text)
+
+    # Free up memory
+    model = None
+    text_to_action = None
+
     return result
 
 
