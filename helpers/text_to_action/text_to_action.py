@@ -10,9 +10,9 @@ logger = logging.getLogger(__name__)
 
 class TextToAction:
     def __init__(self, model: TextPredictionModel) -> None:
-        self._model = model
+        self._model: TextPredictionModel = model
 
-    def convert_text_to_action(self, text: str, actions: List[Action]) -> dict:
+    def convert_text_to_action(self, text: str) -> dict:
         prediction: str = self._model.predict(text)
 
         # Filter out the prediction to extract JSON content

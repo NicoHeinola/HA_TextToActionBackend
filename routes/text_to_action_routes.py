@@ -26,15 +26,17 @@ def convert_text_to_action(token: str = require_auth(), body: dict = Body(...), 
 
     system_prompt: str = Setting.get_setting(db, SettingKey.SYSTEM_PROMPT)
 
+    actions = db.query(Action).all()
+    system_prompt = system_prompt.replace("{actions}", "\n".join([action.to_text() for action in actions]))
+
     model: TextPredictionModel = GGUFTextPredictionModel(
         model_name="Phi-3-mini-4k-instruct-q4.gguf",
         system_prompt=system_prompt,
     )
 
-    actions = db.query(Action).all()
     text_to_action: TextToAction = TextToAction(model)
 
-    result: dict = text_to_action.convert_text_to_action(text, actions=actions)
+    result: dict = text_to_action.convert_text_to_action(text)
     return result
 
 
