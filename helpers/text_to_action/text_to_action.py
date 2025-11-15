@@ -24,8 +24,14 @@ class TextToAction:
         if "```" in prediction:
             prediction = prediction.split("```", 1)[0].strip()
 
+        # Start the prediction from the first {
+        first_brace_index = prediction.find("{")
+        if first_brace_index != -1:
+            prediction = prediction[first_brace_index:]
+
         # Try to fix common JSON issues
         prediction = prediction.replace("\n", " ")
+        prediction_before_modification: str = prediction
 
         if not prediction.startswith("{"):
             prediction = "{" + prediction
@@ -42,6 +48,8 @@ class TextToAction:
             prediction_json = json.loads(prediction)
         except json.JSONDecodeError as e:
             logger.error(f"Failed to parse prediction as JSON: {e}")
-            prediction_json = {}
+            prediction_json = {
+                "ai_answer": prediction_before_modification,
+            }
 
         return prediction_json
