@@ -15,6 +15,8 @@ class TextToAction:
     def convert_text_to_action(self, text: str) -> dict:
         prediction: str = self._model.predict(text)
 
+        logger.info(f"Raw model prediction: {prediction}")
+
         # Filter out the prediction to extract JSON content
         # Remove everything before ```json
         if "```json" in prediction:
@@ -36,11 +38,17 @@ class TextToAction:
         if not prediction.startswith("{"):
             prediction = "{" + prediction
 
-        if not prediction.endswith("}"):
+        if not prediction.endswith(("}", "]")):
             if not prediction.endswith('"'):
                 prediction += '"'
 
             prediction += "}"
+
+        # Fix bracket amounts at the end
+        open_braces = prediction.count("{")
+        close_braces = prediction.count("}")
+        if close_braces < open_braces:
+            prediction += "}" * (open_braces - close_braces)
 
         # Try to convert prediction to JSON
         try:
@@ -48,8 +56,12 @@ class TextToAction:
             prediction_json = json.loads(prediction)
         except json.JSONDecodeError as e:
             logger.error(f"Failed to parse prediction as JSON: {e}")
-            prediction_json = {
-                "ai_answer": prediction_before_modification,
-            }
+            prediction_json = {}
+
+            # If answer contains a lot of \", it means we can't convert to text
+            if prediction.count("{") < 1 and prediction.count("[") < 1 and prediction.count('"') < 5:
+                prediction_json = {
+                    "ai_answer": prediction_before_modification,
+                }
 
         return prediction_json
