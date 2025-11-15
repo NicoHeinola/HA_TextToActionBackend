@@ -59,7 +59,11 @@ class TextToAction:
             prediction_json = {}
 
             # If answer contains a lot of \", it means we can't convert to text
-            if prediction.count("{") < 1 and prediction.count("[") < 1 and prediction.count('"') < 5:
+            curly_count = prediction_before_modification.count("{")
+            square_count = prediction_before_modification.count("[")
+            quote_count = prediction_before_modification.count('"')
+
+            if curly_count < 1 and square_count < 1 and quote_count < 5:
                 prediction_json = {
                     "ai_answer": prediction_before_modification,
                 }

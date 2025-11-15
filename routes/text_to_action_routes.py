@@ -22,6 +22,7 @@ def convert_text_to_action(token: str = require_auth(), body: dict = Body(...), 
     """
 
     text: str = body.get("text", "")
+    model_name: str = body.get("model_name", "phi-4-mini-q4_k_m.gguf")
 
     if not text:
         return Response(content="text is required in the request body", status_code=422)
@@ -35,7 +36,7 @@ def convert_text_to_action(token: str = require_auth(), body: dict = Body(...), 
     system_prompt = system_prompt.replace("{actions}", json.dumps(actions_as_array))
 
     model: TextPredictionModel = GGUFTextPredictionModel(
-        model_name="Phi-3-mini-4k-instruct-q4.gguf",
+        model_name=model_name,
         system_prompt=system_prompt,
     )
 
