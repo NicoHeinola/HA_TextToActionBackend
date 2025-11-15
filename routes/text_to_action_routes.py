@@ -1,8 +1,10 @@
+import json
 import os
+from typing import List
 from fastapi import APIRouter, Body, Depends, Response
 
 from database import get_db
-from db_models.action import Action
+from db_models.action import Action, ActionSchema
 from db_models.setting import Setting, SettingKey
 from helpers.models.text_prediction.gguf.gguf_text_prediction_model import GGUFTextPredictionModel
 from helpers.models.text_prediction.text_prediction_model import TextPredictionModel
@@ -26,8 +28,11 @@ def convert_text_to_action(token: str = require_auth(), body: dict = Body(...), 
 
     system_prompt: str = Setting.get_setting(db, SettingKey.SYSTEM_PROMPT)
 
-    actions = db.query(Action).all()
-    system_prompt = system_prompt.replace("{actions}", "\n".join([action.to_text() for action in actions]))
+    actions: List[Action] = db.query(Action).all()
+    actions_as_array: list = [ActionSchema.model_validate(a).model_dump() for a in actions]
+
+    # Convert actions to an array
+    system_prompt = system_prompt.replace("{actions}", json.dumps(actions_as_array))
 
     model: TextPredictionModel = GGUFTextPredictionModel(
         model_name="Phi-3-mini-4k-instruct-q4.gguf",
