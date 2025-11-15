@@ -2,6 +2,7 @@ import logging
 import os
 from dotenv import load_dotenv
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 from routes.index import router as index_router
 from routes.text_to_action_routes import router as text_to_action_router
@@ -11,6 +12,14 @@ from routes.action_routes import router as action_router
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s]: %(message)s")
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Include routes
 app.include_router(index_router)
