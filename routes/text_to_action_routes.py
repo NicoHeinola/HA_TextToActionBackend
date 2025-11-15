@@ -22,7 +22,7 @@ def convert_text_to_action(token: str = require_auth(), body: dict = Body(...), 
     """
 
     text: str = body.get("text", "")
-    model_name: str = body.get("model_name", "phi-4-mini-q4_k_m.gguf")
+    model_name: str = body.get("model", "phi-4-mini-q4_k_m.gguf")
 
     if not text:
         return Response(content="text is required in the request body", status_code=422)
@@ -35,10 +35,13 @@ def convert_text_to_action(token: str = require_auth(), body: dict = Body(...), 
     # Convert actions to an array
     system_prompt = system_prompt.replace("{actions}", json.dumps(actions_as_array))
 
-    model: TextPredictionModel = GGUFTextPredictionModel(
-        model_name=model_name,
-        system_prompt=system_prompt,
-    )
+    try:
+        model: TextPredictionModel = GGUFTextPredictionModel(
+            model_name=model_name,
+            system_prompt=system_prompt,
+        )
+    except FileNotFoundError as e:
+        return Response(content=str(e), status_code=422)
 
     text_to_action: TextToAction = TextToAction(model)
 

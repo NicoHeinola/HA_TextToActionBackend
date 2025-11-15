@@ -22,7 +22,6 @@ class GGUFTextPredictionModel(TextPredictionModel):
             n_gpu_layers=-1,  # Move all layers to GPU
             flash_attn=True,  # FLASH ATTENTION (huge boost)
             n_threads=4,  # Faster tokenization (CPU side)
-            rope_scaling=None,  # Ensure no context blow-up
             tensor_split=None,  # Single GPU
             verbose=False,
             n_batch=self._n_batch,
