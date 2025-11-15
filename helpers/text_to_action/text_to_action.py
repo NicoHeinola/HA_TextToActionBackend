@@ -24,6 +24,18 @@ class TextToAction:
         if "```" in prediction:
             prediction = prediction.split("```", 1)[0].strip()
 
+        # Try to fix common JSON issues
+        prediction = prediction.replace("\n", " ")
+
+        if not prediction.startswith("{"):
+            prediction = "{" + prediction
+
+        if not prediction.endswith("}"):
+            if not prediction.endswith('"'):
+                prediction += '"'
+
+            prediction += "}"
+
         # Try to convert prediction to JSON
         try:
             logger.info(f"Raw prediction before JSON parsing: {prediction}")
