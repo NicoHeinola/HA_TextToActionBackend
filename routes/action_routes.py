@@ -30,6 +30,10 @@ def update_action(action_id: int, token: str = require_auth(), db: Session = Dep
     if not action:
         return Response(status_code=404, content="action_not_found")
 
+    meta = body.get("meta")
+    if meta and type(meta) is not dict:
+        return Response(status_code=422, content="meta_must_be_dict")
+
     blacklist_fields = ["id"]
     for field in body:
         if field in blacklist_fields:
@@ -49,6 +53,10 @@ def create_action(token: str = require_auth(), db: Session = Depends(get_db), bo
     """
     Endpoint to create a new action.
     """
+
+    meta = body.get("meta")
+    if meta and type(meta) is not dict:
+        return Response(status_code=422, content="meta_must_be_dict")
 
     action = Action()
     blacklist_fields = ["id"]
