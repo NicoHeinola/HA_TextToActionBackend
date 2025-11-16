@@ -2,6 +2,7 @@ import json
 import os
 from typing import List
 from fastapi import APIRouter, Body, Depends, Response
+from fastapi.params import Param
 
 from database import get_db
 from db_models.action import Action, ActionSchema
@@ -55,12 +56,10 @@ def convert_text_to_action(token: str = require_auth(), body: dict = Body(...), 
 
 
 @router.get("/models")
-def list_models(token: str = require_auth(), body: dict = Body(...)):
+def list_models(model_type: str, token: str = require_auth()):
     """
     Endpoint to list available text-to-action models.
     """
-    model_type: str = body.get("model_type", "")
-
     # Sanitize
     model_type = model_type.strip().lower().replace(" ", "_").replace("-", "_").replace(".", "_").replace("/", "_")
 
