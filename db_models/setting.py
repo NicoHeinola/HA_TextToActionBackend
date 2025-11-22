@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 
 class SettingKey:
     SYSTEM_PROMPT = "system_prompt"
+    PREDICTION_TIMEOUT = "prediction_timeout"
 
 
 class Setting(Base):

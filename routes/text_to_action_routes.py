@@ -28,6 +28,7 @@ def convert_text_to_action(token: str = require_auth(), body: dict = Body(...), 
     if not text:
         return Response(content="text is required in the request body", status_code=422)
 
+    # Get system prompt from settings
     system_prompt: str = Setting.get_setting(db, SettingKey.SYSTEM_PROMPT)
 
     actions: List[Action] = db.query(Action).all()
@@ -46,7 +47,14 @@ def convert_text_to_action(token: str = require_auth(), body: dict = Body(...), 
 
     text_to_action: TextToAction | None = TextToAction(model)
 
-    result: dict = text_to_action.convert_text_to_action(text)
+    # Get prediction timeout setting
+    prediction_timeout_str: str = Setting.get_setting(db, SettingKey.PREDICTION_TIMEOUT)
+    try:
+        prediction_timeout: float = float(prediction_timeout_str)
+    except ValueError:
+        prediction_timeout = 5.0
+
+    result: dict = text_to_action.convert_text_to_action(text, timeout=prediction_timeout)
 
     # Free up memory
     model = None

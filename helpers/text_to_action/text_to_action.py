@@ -12,8 +12,8 @@ class TextToAction:
     def __init__(self, model: TextPredictionModel) -> None:
         self._model: TextPredictionModel = model
 
-    def convert_text_to_action(self, text: str) -> dict:
-        prediction: str = self._model.predict(text)
+    def convert_text_to_action(self, text: str, **kwargs) -> dict:
+        prediction: str = self._model.predict(text, **kwargs)
 
         logger.info(f"Raw model prediction: {prediction}")
 
@@ -38,7 +38,7 @@ class TextToAction:
         if not prediction.startswith("{"):
             prediction = "{" + prediction
 
-        if not prediction.endswith(("}", "]")):
+        if not prediction.endswith(("}", "]")) and not prediction.endswith("{"):
             if not prediction.endswith('"'):
                 prediction += '"'
 

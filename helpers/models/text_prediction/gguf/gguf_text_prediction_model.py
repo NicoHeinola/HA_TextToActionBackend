@@ -53,7 +53,7 @@ class GGUFTextPredictionModel(TextPredictionModel):
             logger.error("Error during prediction", exc_info=e)
             yield None
 
-    def predict(self, text: str, timeout: float = 11.1) -> str:
+    def predict(self, text: str, timeout: float = 5.0) -> str:
         prompt = self._get_prompt_text(text)
 
         tokens: List[int] = self._model.tokenize(prompt.encode("utf-8"))
