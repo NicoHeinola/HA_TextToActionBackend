@@ -12,11 +12,11 @@ class GGUFTextPredictionModel(TextPredictionModel):
         super().__init__(model_name, system_prompt)
 
         self._max_tokens: int = kwargs.get("max_tokens", 128)
-        self._n_batch: int = kwargs.get("n_batch", 512 * 4)
+        self._n_batch: int = kwargs.get("n_batch", 512 * 2)
         self._n_ctx: int = kwargs.get("n_ctx", 1024 * 2)
 
         self._model_folder: str = "gguf"
-        self._model: Llama = self.load_model()
+        self._model: Llama | None = self.load_model()
 
     def load_model(self) -> Llama:
         model: Llama = Llama(
@@ -37,6 +37,10 @@ class GGUFTextPredictionModel(TextPredictionModel):
 
     def _stream_prediction(self, tokens: List[int]) -> Generator:
         """Generator function that yields completion chunks from the model."""
+
+        if not self._model:
+            raise RuntimeError("Model is not loaded.")
+
         try:
             # Stream chunks as they're generated
             output = self._model.create_completion(
@@ -54,6 +58,9 @@ class GGUFTextPredictionModel(TextPredictionModel):
             yield None
 
     def predict(self, text: str, timeout: float = 5.0) -> str:
+        if not self._model:
+            raise RuntimeError("Model is not loaded.")
+
         prompt = self._get_prompt_text(text)
 
         tokens: List[int] = self._model.tokenize(prompt.encode("utf-8"))
@@ -67,6 +74,7 @@ class GGUFTextPredictionModel(TextPredictionModel):
 
                 # Process each chunk from the generator
                 for chunk in self._stream_prediction(tokens):
+                    print("--- New chunk received ---")
                     if thread is None:
                         return  # Thread was terminated due to timeout
 
@@ -93,5 +101,8 @@ class GGUFTextPredictionModel(TextPredictionModel):
         if thread.is_alive():
             thread = None
             logger.error("Prediction timed out after %.1f seconds", timeout)
+
+        # Free up model resources
+        self._model = None
 
         return result_container["text"].strip()
