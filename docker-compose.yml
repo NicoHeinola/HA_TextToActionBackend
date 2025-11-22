@@ -1,6 +1,6 @@
 
 services:
-  ha_audio_backend:
+  ha_text_to_action_backend:
     build:
       context: .
 
