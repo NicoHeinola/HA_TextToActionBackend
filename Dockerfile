@@ -36,8 +36,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 ENV CC=gcc CXX=g++
 
+ARG CUDA_ARCH=75
+ENV CUDA_ARCHITECTURES=${CUDA_ARCH}
+
 RUN CMAKE_ARGS="-DGGML_CUDA=on" FORCE_CMAKE=1 \
-    python3 -m pip install --no-cache-dir --force-reinstall --verbose llama-cpp-python
+    python3 -m pip install --no-cache-dir --verbose llama-cpp-python
 
 # Final Stage
 FROM cmake-stage

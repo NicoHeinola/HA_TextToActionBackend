@@ -3,6 +3,8 @@ services:
   ha_text_to_action_backend:
     build:
       context: .
+      args:
+        CUDA_ARCH: ${CUDA_ARCH:-75}
 
     restart: unless-stopped
     entrypoint: ["sh", "-lc", "alembic upgrade head && python run_seeders.py && exec python main.py"]
