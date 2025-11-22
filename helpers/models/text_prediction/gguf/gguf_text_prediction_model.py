@@ -74,7 +74,6 @@ class GGUFTextPredictionModel(TextPredictionModel):
 
                 # Process each chunk from the generator
                 for chunk in self._stream_prediction(tokens):
-                    print("--- New chunk received ---")
                     if thread is None:
                         return  # Thread was terminated due to timeout
 
