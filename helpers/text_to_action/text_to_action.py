@@ -42,7 +42,9 @@ class TextToAction:
         if prediction.endswith('}"'):
             prediction = prediction[:-1]
 
-        if not prediction.endswith(("}", "]")) and not prediction.endswith("{"):
+        is_last_char_number = prediction[-1].isdigit() if prediction else False
+
+        if not prediction.endswith(("}", "]")) and not prediction.endswith("{") and not is_last_char_number:
             if not prediction.endswith('"'):
                 prediction += '"'
 
