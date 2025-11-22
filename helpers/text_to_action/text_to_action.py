@@ -39,6 +39,9 @@ class TextToAction:
         if not prediction.startswith("{"):
             prediction = "{" + prediction
 
+        if prediction.endswith('}"'):
+            prediction = prediction[:-1]
+
         if not prediction.endswith(("}", "]")) and not prediction.endswith("{"):
             if not prediction.endswith('"'):
                 prediction += '"'
