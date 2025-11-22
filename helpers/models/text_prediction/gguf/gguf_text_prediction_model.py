@@ -1,6 +1,10 @@
-from typing import List
+import logging
+from typing import List, Generator
 from helpers.models.text_prediction.text_prediction_model import TextPredictionModel
 from llama_cpp import Llama
+import threading
+
+logger = logging.getLogger(__name__)
 
 
 class GGUFTextPredictionModel(TextPredictionModel):
@@ -31,21 +35,63 @@ class GGUFTextPredictionModel(TextPredictionModel):
 
         return model
 
-    def predict(self, text: str) -> str:
+    def _stream_prediction(self, tokens: List[int]) -> Generator:
+        """Generator function that yields completion chunks from the model."""
+        try:
+            # Stream chunks as they're generated
+            output = self._model.create_completion(
+                tokens,
+                stream=True,
+                max_tokens=self._max_tokens,
+                temperature=0.0,
+                stop=['```"', "```\n", "}\n", "<|Assistant|>", "<|User|>"],
+            )
+
+            for chunk in output:
+                yield chunk
+        except Exception as e:
+            logger.error("Error during prediction", exc_info=e)
+            yield None
+
+    def predict(self, text: str, timeout: float = 11.1) -> str:
         prompt = self._get_prompt_text(text)
 
         tokens: List[int] = self._model.tokenize(prompt.encode("utf-8"))
-        output = self._model.create_completion(
-            tokens,
-            max_tokens=self._max_tokens,
-            temperature=0.0,
-            stop=['```"', "```\n", "}\n", "<|Assistant|>", "<|User|>"],
-        )
 
-        if not isinstance(output, dict):
-            return ""
+        result_container: dict = {"text": ""}
+        thread: threading.Thread | None = None
 
-        choices: list = output.get("choices", [])
-        raw_text = choices[0].get("text")
+        def _predict_in_thread():
+            try:
+                parsed_text: str = ""
 
-        return raw_text.strip()
+                # Process each chunk from the generator
+                for chunk in self._stream_prediction(tokens):
+                    if thread is None:
+                        return  # Thread was terminated due to timeout
+
+                    if chunk is None:
+                        continue
+
+                    choices: list = chunk.get("choices", [])
+                    if not choices:
+                        continue
+
+                    raw_text = choices[0].get("text", "")
+                    parsed_text += raw_text
+
+                result_container["text"] = parsed_text
+            except Exception as e:
+                logger.error("Error consuming generator", exc_info=e)
+
+        # Start prediction in background thread
+        thread = threading.Thread(target=_predict_in_thread, daemon=True)
+        thread.start()
+        thread.join(timeout=timeout)
+
+        # Check if thread is still alive (timeout occurred)
+        if thread.is_alive():
+            thread = None
+            logger.error("Prediction timed out after %.1f seconds", timeout)
+
+        return result_container["text"].strip()
