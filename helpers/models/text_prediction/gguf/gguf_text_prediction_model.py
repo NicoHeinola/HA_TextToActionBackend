@@ -12,7 +12,7 @@ class GGUFTextPredictionModel(TextPredictionModel):
         super().__init__(model_name, system_prompt)
 
         self._max_tokens: int = kwargs.get("max_tokens", 128)
-        self._n_batch: int = kwargs.get("n_batch", 512 * 2)
+        self._n_batch: int = kwargs.get("n_batch", 512 * 4)
         self._n_ctx: int = kwargs.get("n_ctx", 1024 * 2)
 
         self._model_folder: str = "gguf"
