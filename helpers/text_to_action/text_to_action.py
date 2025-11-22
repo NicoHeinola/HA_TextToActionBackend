@@ -32,7 +32,7 @@ class TextToAction:
             prediction = prediction[first_brace_index:]
 
         # Try to fix common JSON issues
-        prediction = prediction.replace("\n", " ")
+        prediction = prediction.strip("\n")
         prediction_before_modification: str = prediction
 
         if not prediction.startswith("{"):
