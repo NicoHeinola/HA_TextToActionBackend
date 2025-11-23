@@ -69,6 +69,10 @@ class TextToAction:
             square_count = prediction_before_modification.count("[")
             quote_count = prediction_before_modification.count('"')
 
+            # If answer ends with a ", remove it
+            if prediction_before_modification.endswith('"'):
+                prediction_before_modification = prediction_before_modification[:-1]
+
             if curly_count < 1 and square_count < 1 and quote_count < 5:
                 prediction_json = {
                     "ai_answer": prediction_before_modification,
