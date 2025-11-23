@@ -4,9 +4,8 @@ from typing import Any
 
 
 class TextPredictionModel(ABC):
-    def __init__(self, model_name: str, system_prompt: str = ""):
+    def __init__(self, model_name: str):
         self._model_name = model_name
-        self._system_prompt = system_prompt
 
         # Used for getting model path
         self._model_folder: str = ""
@@ -23,9 +22,9 @@ class TextPredictionModel(ABC):
 
         return model_path
 
-    def _get_prompt_text(self, user_input: str) -> str:
+    def _get_prompt_text(self, system_prompt: str, user_input: str) -> str:
         return '<|System|>"{system_prompt}"\n<|User|>"{user_input}"\n<|Assistant|>"'.format(
-            system_prompt=self._system_prompt, user_input=user_input
+            system_prompt=system_prompt, user_input=user_input
         )
 
     @abstractmethod
@@ -33,5 +32,5 @@ class TextPredictionModel(ABC):
         pass
 
     @abstractmethod
-    def predict(self, text: str) -> str:
+    def predict(self, system_prompt: str, user_input: str, *args, **kwargs) -> str:
         pass

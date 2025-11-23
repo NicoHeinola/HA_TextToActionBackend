@@ -7,7 +7,7 @@ from fastapi.params import Param
 from database import get_db
 from db_models.action import Action, ActionSchema
 from db_models.setting import Setting, SettingKey
-from helpers.cache.model_cache import cache_model, get_cached_model
+from helpers.cache.model_cache import get_cached_model
 from helpers.models.text_prediction.gguf.gguf_text_prediction_model import GGUFTextPredictionModel
 from helpers.models.text_prediction.text_prediction_model import TextPredictionModel
 from middleware.auth import require_auth
@@ -31,37 +31,34 @@ def convert_text_to_action(token: str = require_auth(), body: dict = Body(...), 
     if not text:
         return Response(content="text is required in the request body", status_code=422)
 
-    # Get system prompt from settings
-    system_prompt: str = Setting.get_setting(db, SettingKey.SYSTEM_PROMPT)
-
-    actions: List[Action] = db.query(Action).all()
-    actions_as_array: list = [ActionSchema.model_validate(a).model_dump() for a in actions]
-
-    # Convert actions to an array
-    system_prompt = system_prompt.replace("{actions}", json.dumps(actions_as_array))
-
+    # --- Get model from cache or load new one
     try:
         model = get_cached_model(model_name)
 
         if model is None:
-            model: TextPredictionModel | None = GGUFTextPredictionModel(
-                model_name=model_name,
-                system_prompt=system_prompt,
-            )
-            cache_model(model_name, model)
+            model: TextPredictionModel | None = GGUFTextPredictionModel(model_name=model_name)
     except FileNotFoundError as e:
         return Response(content=str(e), status_code=422)
 
     text_to_action: TextToAction | None = TextToAction(model)
 
-    # Get prediction timeout setting
+    # --- Get prediction timeout setting
     prediction_timeout_str: str = Setting.get_setting(db, SettingKey.PREDICTION_TIMEOUT)
     try:
         prediction_timeout: float = float(prediction_timeout_str)
     except ValueError:
         prediction_timeout = 5.0
 
-    result: dict = text_to_action.convert_text_to_action(text, timeout=prediction_timeout)
+    # --- Get system prompt from settings
+    system_prompt: str = Setting.get_setting(db, SettingKey.SYSTEM_PROMPT)
+
+    actions: List[Action] = db.query(Action).all()
+    actions_as_array: list = [ActionSchema.model_validate(a).model_dump() for a in actions]
+
+    system_prompt = system_prompt.replace("{actions}", json.dumps(actions_as_array))
+
+    # --- Convert text to action
+    result: dict = text_to_action.convert_text_to_action(system_prompt, text, timeout=prediction_timeout)
 
     # Free up memory (Don't free up the model itself since it can be used again)
     text_to_action = None

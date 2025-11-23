@@ -1,4 +1,5 @@
 import logging
+import sys
 from typing import List, Generator
 from helpers.models.text_prediction.text_prediction_model import TextPredictionModel
 from llama_cpp import Llama
@@ -8,8 +9,8 @@ logger = logging.getLogger(__name__)
 
 
 class GGUFTextPredictionModel(TextPredictionModel):
-    def __init__(self, model_name: str, system_prompt: str = "", *args, **kwargs):
-        super().__init__(model_name, system_prompt)
+    def __init__(self, model_name: str, *args, **kwargs):
+        super().__init__(model_name)
 
         self._max_tokens: int = kwargs.get("max_tokens", 128)
         self._n_batch: int = kwargs.get("n_batch", 512 * 4)
@@ -57,11 +58,11 @@ class GGUFTextPredictionModel(TextPredictionModel):
             logger.error("Error during prediction", exc_info=e)
             yield None
 
-    def predict(self, text: str, timeout: float = 5.0) -> str:
+    def predict(self, system_prompt: str, user_input: str, timeout: float = 5.0) -> str:
         if not self._model:
             raise RuntimeError("Model is not loaded.")
 
-        prompt = self._get_prompt_text(text)
+        prompt = self._get_prompt_text(system_prompt, user_input)
 
         tokens: List[int] = self._model.tokenize(prompt.encode("utf-8"))
 
