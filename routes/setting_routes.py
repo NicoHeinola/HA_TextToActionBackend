@@ -25,8 +25,9 @@ def get_settings(token: str = require_auth(), db: Session = Depends(get_db)):
 @router.post("/seed")
 def seed_settings(token: str = require_auth(), db: Session = Depends(get_db), body: dict = Body(...)):
     replace: bool = body.get("replace", False)
+    keys_to_seed: List[str] = body.get("keys_to_seed", [])
 
-    SettingSeeder(db).seed(replace=replace)
+    SettingSeeder(db).seed(replace=replace, keys_to_seed=keys_to_seed)
 
     return Response(status_code=200)
 

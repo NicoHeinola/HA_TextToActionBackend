@@ -1,14 +1,18 @@
 import json
+from typing import List
 from db_models.setting import Setting
 from .seeder import Seeder
 
 
 class SettingSeeder(Seeder):
-    def seed(self, replace: bool = False, json_path="seeders/data/default_settings.json"):
+    def seed(self, replace: bool = False, keys_to_seed: List[str] = [], json_path="seeders/data/default_settings.json"):
         with open(json_path, "r", encoding="utf-8") as f:
             settings = json.load(f)
 
         for setting in settings:
+            if len(keys_to_seed) > 0 and setting["key"] not in keys_to_seed:
+                continue
+
             existing = self.db.query(Setting).filter(Setting.key == setting["key"]).first()
             if existing:
                 if not replace:
