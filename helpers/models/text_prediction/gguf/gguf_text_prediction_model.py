@@ -101,7 +101,4 @@ class GGUFTextPredictionModel(TextPredictionModel):
             thread = None
             logger.error("Prediction timed out after %.1f seconds", timeout)
 
-        # Free up model resources
-        self._model = None
-
         return result_container["text"].strip()

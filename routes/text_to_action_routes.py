@@ -7,6 +7,7 @@ from fastapi.params import Param
 from database import get_db
 from db_models.action import Action, ActionSchema
 from db_models.setting import Setting, SettingKey
+from helpers.cache.model_cache import cache_model, get_cached_model
 from helpers.models.text_prediction.gguf.gguf_text_prediction_model import GGUFTextPredictionModel
 from helpers.models.text_prediction.text_prediction_model import TextPredictionModel
 from middleware.auth import require_auth
@@ -40,10 +41,14 @@ def convert_text_to_action(token: str = require_auth(), body: dict = Body(...), 
     system_prompt = system_prompt.replace("{actions}", json.dumps(actions_as_array))
 
     try:
-        model: TextPredictionModel | None = GGUFTextPredictionModel(
-            model_name=model_name,
-            system_prompt=system_prompt,
-        )
+        model = get_cached_model(model_name)
+
+        if model is None:
+            model: TextPredictionModel | None = GGUFTextPredictionModel(
+                model_name=model_name,
+                system_prompt=system_prompt,
+            )
+            cache_model(model_name, model)
     except FileNotFoundError as e:
         return Response(content=str(e), status_code=422)
 
@@ -58,8 +63,7 @@ def convert_text_to_action(token: str = require_auth(), body: dict = Body(...), 
 
     result: dict = text_to_action.convert_text_to_action(text, timeout=prediction_timeout)
 
-    # Free up memory
-    model = None
+    # Free up memory (Don't free up the model itself since it can be used again)
     text_to_action = None
 
     return result
@@ -85,6 +89,7 @@ def list_models(model_type: str, token: str = require_auth()):
             and not name.endswith(".md")
             or os.path.isdir(os.path.join(models_dir, name))
         ]
-        return {"available_models": models}
+
+        return models
     except Exception as e:
         return Response(content=str(e), status_code=500)

@@ -52,7 +52,4 @@ def update_setting(setting_id: int, token: str = require_auth(), db: Session = D
 
     db.commit()
 
-    return {
-        "message": "setting_updated",
-        "setting": setting,
-    }
+    return setting
