@@ -8,5 +8,10 @@
 		"key": "prediction_timeout",
 		"value": "5",
 		"type": "integer"
+	},
+	{
+		"key": "default_model",
+		"value": "phi-4-mini-q2_k_m.gguf",
+		"type": "string"
 	}
 ]
