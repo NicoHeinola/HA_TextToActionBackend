@@ -23,10 +23,14 @@ def convert_text_to_action(token: str = require_auth(), body: dict = Body(...), 
     Endpoint to convert text to action using TextToAction helper.
     """
 
-    default_model: str = os.getenv("DEFAULT_TEXT_TO_ACTION_MODEL", "")
+    # --- Get prediction timeout setting
+    default_model: str = Setting.get_setting(db, SettingKey.DEFAULT_MODEL)
 
     text: str = body.get("text", "")
     model_name: str = body.get("model", default_model)
+
+    if not model_name:
+        return Response(content="Model is required in the request body. No default model set", status_code=422)
 
     if not text:
         return Response(content="text is required in the request body", status_code=422)
