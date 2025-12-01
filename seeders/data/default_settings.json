@@ -15,7 +15,7 @@
 		"type": "string"
 	},
 	{
-		"key": "auto_cache_models",
+		"key": "auto_cached_models",
 		"value": [
 			{
 				"name": "phi-4-mini-q2_k_m.gguf",

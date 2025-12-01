@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 cached_models: Dict[str, TextPredictionModel] = {}
 
 
-def auto_cache_models(models: List[Dict[str, str]]) -> None:
+def auto_cached_models(models: List[Dict[str, str]]) -> None:
     for model_info in models:
         model_name = model_info.get("name")
         model_type = model_info.get("type")
