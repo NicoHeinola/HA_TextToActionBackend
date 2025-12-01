@@ -1,6 +1,7 @@
 import json
 from typing import List
 from db_models.setting import Setting
+from helpers.setting.dynamic_type_converter import DynamicTypeConverter
 from .seeder import Seeder
 
 
@@ -10,6 +11,9 @@ class SettingSeeder(Seeder):
             settings = json.load(f)
 
         for setting in settings:
+            # Convert the value to string for storage
+            setting["value"] = DynamicTypeConverter.to_string(setting["value"])
+
             if len(keys_to_seed) > 0 and setting["key"] not in keys_to_seed:
                 continue
 

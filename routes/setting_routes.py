@@ -2,7 +2,7 @@ from typing import List
 from fastapi import APIRouter, Body, Depends, Response
 
 from database import get_db
-from db_models.setting import Setting
+from db_models.setting import Setting, SettingResponse
 from middleware.auth import require_auth
 from sqlalchemy.orm import Session
 
@@ -11,7 +11,7 @@ from seeders.setting_seeder import SettingSeeder
 router = APIRouter()
 
 
-@router.get("/")
+@router.get("/", response_model=List[SettingResponse])
 def get_settings(token: str = require_auth(), db: Session = Depends(get_db)):
     """
     Endpoint to get application settings.
@@ -32,7 +32,7 @@ def seed_settings(token: str = require_auth(), db: Session = Depends(get_db), bo
     return Response(status_code=200)
 
 
-@router.put("/{setting_id}")
+@router.put("/{setting_id}", response_model=SettingResponse)
 def update_setting(setting_id: int, token: str = require_auth(), db: Session = Depends(get_db), body: dict = Body(...)):
     """
     Endpoint to update a specific setting by ID.

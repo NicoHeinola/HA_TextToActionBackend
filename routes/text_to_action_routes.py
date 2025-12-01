@@ -24,7 +24,7 @@ def convert_text_to_action(token: str = require_auth(), body: dict = Body(...), 
     """
 
     # --- Get prediction timeout setting
-    default_model: str = Setting.get_setting(db, SettingKey.DEFAULT_MODEL)
+    default_model: str = Setting.get_setting_value(db, SettingKey.DEFAULT_MODEL)
 
     text: str = body.get("text", "")
     model_name: str = body.get("model", default_model)
@@ -47,14 +47,10 @@ def convert_text_to_action(token: str = require_auth(), body: dict = Body(...), 
     text_to_action: TextToAction | None = TextToAction(model)
 
     # --- Get prediction timeout setting
-    prediction_timeout_str: str = Setting.get_setting(db, SettingKey.PREDICTION_TIMEOUT)
-    try:
-        prediction_timeout: float = float(prediction_timeout_str)
-    except ValueError:
-        prediction_timeout = 5.0
+    prediction_timeout: float = Setting.get_setting_value(db, SettingKey.PREDICTION_TIMEOUT)
 
     # --- Get system prompt from settings
-    system_prompt: str = Setting.get_setting(db, SettingKey.SYSTEM_PROMPT)
+    system_prompt: str = Setting.get_setting_value(db, SettingKey.SYSTEM_PROMPT)
 
     actions: List[Action] = db.query(Action).all()
     actions_as_array: list = [ActionSchema.model_validate(a).model_dump() for a in actions]

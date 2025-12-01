@@ -13,5 +13,10 @@
 		"key": "default_model",
 		"value": "phi-4-mini-q2_k_m.gguf",
 		"type": "string"
+	},
+	{
+		"key": "auto_cache_models",
+		"value": ["phi-4-mini-q2_k_m.gguf"],
+		"type": "array"
 	}
 ]
