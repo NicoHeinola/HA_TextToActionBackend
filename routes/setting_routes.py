@@ -3,6 +3,7 @@ from fastapi import APIRouter, Body, Depends, Response
 
 from database import get_db
 from db_models.setting import Setting, SettingResponse
+from helpers.setting.dynamic_type_converter import DynamicTypeConverter
 from middleware.auth import require_auth
 from sqlalchemy.orm import Session
 
@@ -46,6 +47,9 @@ def update_setting(setting_id: int, token: str = require_auth(), db: Session = D
     for field in body:
         if field in blacklist_fields:
             continue
+
+        if field == "value":
+            body[field] = DynamicTypeConverter.to_string(body[field])
 
         if hasattr(setting, field):
             setattr(setting, field, body[field])
