@@ -10,6 +10,7 @@ class SettingKey:
     SYSTEM_PROMPT = "system_prompt"
     PREDICTION_TIMEOUT = "prediction_timeout"
     DEFAULT_MODEL = "default_model"
+    AUTO_CACHE_MODELS = "auto_cache_models"
 
 
 class SettingResponse(BaseModel):

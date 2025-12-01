@@ -1,9 +1,32 @@
+import logging
 from typing import Dict, List
 
+from helpers.models.text_prediction.gguf.gguf_text_prediction_model import GGUFTextPredictionModel
 from helpers.models.text_prediction.text_prediction_model import TextPredictionModel
 
 
+logger = logging.getLogger(__name__)
+
 cached_models: Dict[str, TextPredictionModel] = {}
+
+
+def auto_cache_models(models: List[Dict[str, str]]) -> None:
+    for model_info in models:
+        model_name = model_info.get("name")
+        model_type = model_info.get("type")
+
+        if not model_name or not model_type:
+            continue
+
+        model: TextPredictionModel | None = None
+        if model_type == "gguf":
+            model = GGUFTextPredictionModel(model_name)
+
+        if not model:
+            continue
+
+        logger.info(f"Auto-caching model: {model_name} of type {model_type}")
+        cache_model(model_name, model)
 
 
 def cache_model(model_name: str, model: TextPredictionModel) -> None:

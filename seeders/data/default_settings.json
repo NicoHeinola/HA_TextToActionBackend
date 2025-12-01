@@ -16,7 +16,12 @@
 	},
 	{
 		"key": "auto_cache_models",
-		"value": ["phi-4-mini-q2_k_m.gguf"],
+		"value": [
+			{
+				"name": "phi-4-mini-q2_k_m.gguf",
+				"type": "gguf"
+			}
+		],
 		"type": "array"
 	}
 ]

@@ -1,4 +1,5 @@
 import os
+from typing import Any, Generator
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from dotenv import load_dotenv
@@ -19,7 +20,7 @@ engine = create_engine(
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
-def get_db():
+def get_db() -> Generator[Any, Any, Any]:
     db = SessionLocal()
     try:
         yield db
