@@ -8,6 +8,7 @@ from routes.text_to_action_routes import router as text_to_action_router
 from routes.setting_routes import router as setting_router
 from routes.action_routes import router as action_router
 from routes.cache_routes import router as cache_router
+from routes.log_routes import router as log_router
 from events.fast_api_events import lifespan
 from setup_logging import setup_logging
 
@@ -30,6 +31,7 @@ app.include_router(text_to_action_router, prefix="/text-to-action")
 app.include_router(setting_router, prefix="/settings")
 app.include_router(action_router, prefix="/actions")
 app.include_router(cache_router, prefix="/cache")
+app.include_router(log_router, prefix="/logs")
 
 
 if __name__ == "__main__":
