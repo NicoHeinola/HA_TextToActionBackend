@@ -30,8 +30,6 @@ class GGUFTextPredictionModel(TextPredictionModel):
             tensor_split=None,  # Single GPU
             verbose=False,
             n_batch=self._n_batch,
-            # OTHER
-            seed=-1,  # Use random seed
         )
 
         return model

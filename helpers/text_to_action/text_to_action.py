@@ -33,7 +33,6 @@ class TextToAction:
 
         # Try to fix common JSON issues
         prediction = prediction.strip("\n")
-        prediction = prediction.replace('\\"', '"')
         prediction_before_modification: str = prediction
 
         if not prediction.startswith("{"):
