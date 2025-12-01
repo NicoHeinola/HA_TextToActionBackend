@@ -15,6 +15,7 @@ services:
     volumes:
     - ./models:/app/models
     - ./database_instance:/app/database_instance
+    - ./logs:/app/logs
 
     deploy:
       resources:

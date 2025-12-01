@@ -1,4 +1,3 @@
-import logging
 import os
 from dotenv import load_dotenv
 from fastapi import FastAPI
@@ -10,8 +9,9 @@ from routes.setting_routes import router as setting_router
 from routes.action_routes import router as action_router
 from routes.cache_routes import router as cache_router
 from events.fast_api_events import lifespan
+from setup_logging import setup_logging
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s]: %(message)s")
+setup_logging()
 
 
 app = FastAPI(lifespan=lifespan)
