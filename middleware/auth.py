@@ -16,6 +16,10 @@ def get_api_token(authorization: Optional[str] = Header(None)) -> str:
     Raises:
         HTTPException: If token is missing, invalid format, or doesn't match
     """
+    is_auth_enabled: bool = os.getenv("AUTH_ENABLED", "true").lower() not in ("false", "0", "f")
+    if not is_auth_enabled:
+        return ""
+
     if not authorization:
         raise HTTPException(
             status_code=401, detail="Authorization header is required", headers={"WWW-Authenticate": "Bearer"}
