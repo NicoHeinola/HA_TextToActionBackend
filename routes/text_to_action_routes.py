@@ -13,6 +13,7 @@ from helpers.models.text_prediction.text_prediction_model import TextPredictionM
 from middleware.auth import require_auth
 from helpers.text_to_action.text_to_action import TextToAction
 from sqlalchemy.orm import Session
+from db_models.chat_history.chat_history_message import ChatHistoryMessage, ChatHistoryMessageSchema
 
 router = APIRouter()
 
@@ -28,6 +29,11 @@ def convert_text_to_action(token: str = require_auth(), body: dict = Body(...), 
 
     text: str = body.get("text", "")
     model_name: str = body.get("model", default_model)
+
+    try:
+        chat_history_id: int | None = int(body.get("chat_history_id", ""))
+    except (ValueError, TypeError):
+        chat_history_id = None
 
     if not model_name:
         return Response(content="Model is required in the request body. No default model set", status_code=422)
@@ -52,10 +58,24 @@ def convert_text_to_action(token: str = require_auth(), body: dict = Body(...), 
     # --- Get system prompt from settings
     system_prompt: str = Setting.get_setting_value(db, SettingKey.SYSTEM_PROMPT)
 
+    # --- Get chat history
+    messages: List[dict] = []
+    if chat_history_id:
+        chat_history_messages = (
+            db.query(ChatHistoryMessage)
+            .filter(ChatHistoryMessage.chat_history_id == chat_history_id)
+            .order_by(ChatHistoryMessage.id.asc())
+            .all()
+        )
+
+        messages = [ChatHistoryMessageSchema.model_validate(message).model_dump() for message in chat_history_messages]
+        messages = [{"message": message.get("message"), "type": message.get("type")} for message in messages]
+
     actions: List[Action] = db.query(Action).all()
-    actions_as_array: list = [ActionSchema.model_validate(a).model_dump() for a in actions]
+    actions_as_array: list = [ActionSchema.model_validate(action).model_dump() for action in actions]
 
     system_prompt = system_prompt.replace("{actions}", json.dumps(actions_as_array))
+    system_prompt = system_prompt.replace("{chat_history}", json.dumps(messages))
 
     # --- Convert text to action
     result: dict = text_to_action.convert_text_to_action(system_prompt, text, timeout=prediction_timeout)
