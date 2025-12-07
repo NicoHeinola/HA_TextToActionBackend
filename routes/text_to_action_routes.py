@@ -13,7 +13,11 @@ from helpers.models.text_prediction.text_prediction_model import TextPredictionM
 from middleware.auth import require_auth
 from helpers.text_to_action.text_to_action import TextToAction
 from sqlalchemy.orm import Session
-from db_models.chat_history.chat_history_message import ChatHistoryMessage, ChatHistoryMessageSchema
+from db_models.chat_history.chat_history_message import (
+    ChatHistoryMessage,
+    ChatHistoryMessageSchema,
+    ChatHistoryMessageType,
+)
 
 router = APIRouter()
 
@@ -79,6 +83,24 @@ def convert_text_to_action(token: str = require_auth(), body: dict = Body(...), 
 
     # --- Convert text to action
     result: dict = text_to_action.convert_text_to_action(system_prompt, text, timeout=prediction_timeout)
+
+    # --- Save messages to chat history if applicable
+    if chat_history_id:
+        user_message = ChatHistoryMessage(
+            chat_history_id=chat_history_id,
+            message=text,
+            type=ChatHistoryMessageType.USER,
+        )
+        db.add(user_message)
+        db.commit()
+
+        ai_message = ChatHistoryMessage(
+            chat_history_id=chat_history_id,
+            message=result.get("ai_answer", ""),
+            type=ChatHistoryMessageType.AI,
+        )
+        db.add(ai_message)
+        db.commit()
 
     # Free up memory (Don't free up the model itself since it can be used again)
     text_to_action = None

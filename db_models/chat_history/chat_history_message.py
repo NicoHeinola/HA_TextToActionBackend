@@ -4,6 +4,11 @@ from pydantic import BaseModel
 from typing import Optional
 
 
+class ChatHistoryMessageType:
+    USER = "user"
+    AI = "AI"
+
+
 class ChatHistoryMessage(Base):
     __tablename__ = "chat_history_message"
     id = Column(Integer, primary_key=True)
