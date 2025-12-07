@@ -1,7 +1,6 @@
 from sqlalchemy import Column, Integer
 from db_models.base import Base
 from pydantic import BaseModel
-from typing import Optional
 
 
 class ChatHistory(Base):

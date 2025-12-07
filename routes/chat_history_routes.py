@@ -1,8 +1,6 @@
-from typing import List
-from fastapi import APIRouter, Body, Depends, Response
+from fastapi import APIRouter, Depends
 
 from database import get_db
-from db_models.action import Action
 from db_models.chat_history import ChatHistory
 from middleware.auth import require_auth
 from sqlalchemy.orm import Session
